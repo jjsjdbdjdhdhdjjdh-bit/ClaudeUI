@@ -1,27 +1,27 @@
 # ClaudeUI
 
-Interface library para scripts Roblox. Dark theme com acento laranja, acrylic blur opcional, ícones Lucide e componentes prontos pra usar.
+A clean, dark-themed UI library for Roblox executor scripts. Orange accent, optional acrylic blur, Lucide icons, and a set of components that are straightforward to use.
 
 ---
 
-## Começando
+## Setup
 
-Cole o conteúdo completo da `ClaudeUI` dentro de uma string e execute com `loadstring`:
+Paste the full ClaudeUI source inside a string and run it through `loadstring`:
 
 ```lua
-local abc = [[ ...conteúdo da ClaudeUI... ]]
+local abc = [[ ...ClaudeUI source here... ]]
 local UI = loadstring(abc)()
 ```
 
-Depois crie uma janela:
+Then spin up a window:
 
 ```lua
 local win = UI.new({
-    Title  = "Meu Script",
-    Icon   = "zap",         -- nome de ícone Lucide (opcional)
-    Width  = 720,
-    Height = 500,
-    Acrylic = false,        -- blur de fundo (só funciona fora do Studio)
+    Title   = "My Script",
+    Icon    = "zap",      -- any Lucide icon name, optional
+    Width   = 720,
+    Height  = 500,
+    Acrylic = false,      -- glass blur (won't show inside Studio)
 })
 ```
 
@@ -29,15 +29,16 @@ local win = UI.new({
 
 ## Home Tab
 
-A home tab é opcional mas vem com bastante coisa pronta: banner com avatar, relógio, chips de ping/players/jogo/executor, changelog em timeline, painel de amigos e banner do Discord.
+Completely optional, but it comes with a lot out of the box — an avatar banner with a live clock, chips showing ping / player count / game name / executor, a changelog timeline, a friends panel, and a Discord invite banner.
 
 ```lua
 win:CreateHomeTab({
-    DiscordInvite        = "seuservidor",          -- opcional
+    DiscordInvite        = "yourserver",
     SupportedExecutors   = { "Synapse X", "Xeno" },
     UnsupportedExecutors = { "Krnl" },
     Changelog = {
-        { Title = "v1.0", Date = "01/01/2026", Description = "Lançamento." },
+        { Title = "v1.0", Date = "01/01/2026", Description = "Initial release." },
+        { Title = "v1.1", Date = "02/10/2026", Description = "Fixed a few things." },
     },
 })
 ```
@@ -50,21 +51,21 @@ win:CreateHomeTab({
 local tab = win:CreateTab({ Title = "Player", Icon = "user" })
 ```
 
-O segundo argumento `Icon` é qualquer nome válido da biblioteca [Lucide Icons](https://lucide.dev/icons/).
+`Icon` takes any name from [lucide.dev/icons](https://lucide.dev/icons). If the icon fails to load it just won't show — nothing explodes.
 
 ---
 
-## Componentes
+## Components
 
 ### Label
 
-Texto simples. Útil pra títulos de seção.
+Plain text. Works well for section headers or short notes.
 
 ```lua
-tab:AddLabel("Seção", {
+tab:AddLabel("Movement", {
     TextSize = 11,
     Color    = Color3.fromRGB(180, 180, 180),
-    Rich     = false,   -- RichText
+    Rich     = false,  -- set true if you want RichText tags
 })
 ```
 
@@ -72,7 +73,7 @@ tab:AddLabel("Seção", {
 
 ### Separator
 
-Linha divisória horizontal.
+A thin horizontal line to break up a busy tab.
 
 ```lua
 tab:AddSeparator()
@@ -83,11 +84,11 @@ tab:AddSeparator()
 ### Button
 
 ```lua
-tab:AddButton("Clique aqui", function()
-    print("clicado")
+tab:AddButton("Do Something", function()
+    -- your logic here
 end, {
     Icon    = "mouse-pointer",
-    Primary = false,   -- true = laranja
+    Primary = false,  -- true gives you the filled orange style
     Height  = 36,
 })
 ```
@@ -97,15 +98,15 @@ end, {
 ### Toggle
 
 ```lua
-local toggle = tab:AddToggle("Ativar", false, function(state)
+local toggle = tab:AddToggle("Enable Feature", false, function(state)
     print(state)
 end, {
     Icon  = "power",
-    Style = "box",   -- "box" ou "basic" (capsule)
+    Style = "box",   -- "box" for checkbox, "basic" for pill/capsule
 })
 
-toggle.Get()        -- → true/false
-toggle.Set(true)
+toggle.Get()       -- returns true or false
+toggle.Set(true)   -- set it from outside the callback
 ```
 
 ---
@@ -113,12 +114,13 @@ toggle.Set(true)
 ### Slider
 
 ```lua
-local slider = tab:AddSlider("Velocidade", 0, 100, 50, function(val)
-    print(val)
+local slider = tab:AddSlider("Walk Speed", 16, 200, 16, function(val)
+    local char = game.Players.LocalPlayer.Character
+    if char then char.Humanoid.WalkSpeed = val end
 end)
 
 slider.Get()
-slider.Set(75)
+slider.Set(100)
 ```
 
 ---
@@ -126,32 +128,34 @@ slider.Set(75)
 ### Dropdown
 
 ```lua
-local dropdown = tab:AddDropdown("Modo", {
-    "Opção A",
-    "Opção B",
-    "Opção C",
+local dropdown = tab:AddDropdown("Target Part", {
+    "Head",
+    "Torso",
+    "Random",
 }, function(val)
-    print(val)
+    print("picked:", val)
 end, {
     Icon    = "list",
-    Default = "Opção A",
+    Default = "Head",
 })
 
 dropdown.Get()
-dropdown.Set("Opção B")
+dropdown.Set("Torso")
 ```
 
 ---
 
 ### Input
 
-Dispara o callback ao perder foco. O segundo parâmetro `enter` é `true` quando o usuário pressionou Enter.
+Fires the callback when the box loses focus. The `enter` param is `true` if the user hit Enter to confirm.
 
 ```lua
-tab:AddInput("Digite algo...", function(text, enter)
-    if enter then print(text) end
+tab:AddInput("Type a command...", function(text, enter)
+    if enter and text ~= "" then
+        print(text)
+    end
 end, {
-    Icon    = "edit-3",
+    Icon    = "terminal",
     Default = "",
     Height  = 38,
 })
@@ -161,46 +165,46 @@ end, {
 
 ## Toasts
 
-Notificações que aparecem no canto inferior direito da tela.
+Small notifications that stack in the bottom-right corner.
 
 ```lua
-win:Toast("Mensagem aqui", "success", 3)
---                          ↑ kind     ↑ duração em segundos
+win:Toast("Operation completed!", "success", 3)
+--                                 ↑ kind     ↑ how long in seconds
 ```
 
-| Kind | Cor |
+| Kind | Color |
 |---|---|
-| `"success"` | Verde |
-| `"warning"` | Amarelo |
-| `"error"` | Vermelho |
-| `"info"` | Azul |
+| `"success"` | Green |
+| `"warning"` | Yellow |
+| `"error"` | Red |
+| `"info"` | Blue |
 
 ---
 
-## Destruir a UI
+## Destroying
 
 ```lua
 win:Destroy()
 ```
 
-Remove a janela e limpa o blur se estiver ativo.
+Removes the window and cleans up the acrylic blur part if it was active.
 
 ---
 
-## Referência rápida
+## Quick Reference
 
 ```
-UI.new(config)                          → Window
+UI.new(config)                               → Window
 win:CreateHomeTab(config)
-win:CreateTab(config)                   → Tab
+win:CreateTab(config)                        → Tab
 win:Toast(message, kind, duration)
 win:Destroy()
 
-tab:AddLabel(text, opts)                → TextLabel
-tab:AddSeparator()                      → Frame
-tab:AddButton(text, callback, opts)     → TextButton
-tab:AddToggle(label, default, cb, opts) → { Get, Set }
-tab:AddSlider(label, min, max, def, cb) → { Get, Set }
-tab:AddDropdown(label, items, cb, opts) → { Get, Set }
-tab:AddInput(placeholder, cb, opts)     → TextBox
+tab:AddLabel(text, opts)                     → TextLabel
+tab:AddSeparator()                           → Frame
+tab:AddButton(text, callback, opts)          → TextButton
+tab:AddToggle(label, default, cb, opts)      → { Get, Set }
+tab:AddSlider(label, min, max, default, cb)  → { Get, Set }
+tab:AddDropdown(label, items, cb, opts)      → { Get, Set }
+tab:AddInput(placeholder, cb, opts)          → TextBox
 ```
