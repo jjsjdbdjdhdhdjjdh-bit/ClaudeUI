@@ -9,8 +9,7 @@ A clean, dark-themed UI library for Roblox executor scripts. Orange accent, opti
 Paste the full ClaudeUI source inside a string and run it through `loadstring`:
 
 ```lua
-local abc = [[ ...ClaudeUI source here... ]]
-local UI = loadstring(abc)()
+local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/jjsjdbdjdhdhdjjdh-bit/ClaudeUI/refs/heads/main/ClaudeLibrary.lua"))()
 ```
 
 Then spin up a window:
