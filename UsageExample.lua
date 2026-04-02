@@ -1,4 +1,4 @@
-local UI = loadstring()()
+local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/jjsjdbdjdhdhdjjdh-bit/ClaudeUI/refs/heads/main/ClaudeLibrary.lua"))()
 
 local win = UI.new({
 	Title  = "My Script",
