@@ -430,7 +430,7 @@ function ClaudeUI.new(config)
 			asset = iconCfg
 		else
 			asset = iconAsset(iconCfg)
-		end
+		end																																																																																																																																																																																																																																																																																																																																																									
 		if asset then
 			inst("ImageLabel", {
 				Size                   = UDim2.new(0, TITLE_ICON_S, 0, TITLE_ICON_S),
@@ -2267,4 +2267,3 @@ function ClaudeUI:Destroy()
 end
 
 return ClaudeUI
-]]
